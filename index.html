@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Personalized Study Planner</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f9;
+      color: #333;
+    }
+
+    header {
+      text-align: center;
+      padding: 20px 0;
+      background-color: #9b59b6;
+      color: white;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 8px rgba(155, 89, 182, 0.4);
+    }
+
+    header h1 {
+      font-size: 2em;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .header-sticker {
+      font-size: 1.6em;
+    }
+
+    .main-container {
+      display: flex;
+      gap: 20px;
+      padding: 0 20px 20px;
+    }
+
+    #calendar-section {
+      flex: 0 0 320px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #right-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    section {
+      background: white;
+      padding: 20px 25px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    }
+
+    #calendar {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    .day {
+      border: 2px solid #9b59b6;
+      padding: 15px;
+      border-radius: 8px;
+      background-color: #f8f4fb;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(155, 89, 182, 0.15);
+      position: relative;
+    }
+
+    .day h3 {
+      font-size: 1.2em;
+      margin-bottom: 12px;
+      color: #6f3392;
+    }
+
+    .sticker {
+      position: absolute;
+      font-size: 1.5em;
+      top: 8px;
+      right: 10px;
+      pointer-events: none;
+    }
+
+    .day ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .day ul li {
+      margin-bottom: 10px;
+      font-size: 0.9em;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #fff;
+      padding: 5px 8px;
+      border-radius: 6px;
+      box-shadow: 0 1px 4px rgba(155, 89, 182, 0.1);
+    }
+
+    .day input[type="number"] {
+      width: 50px;
+      margin-left: 5px;
+      border-radius: 4px;
+      border: 1px solid #bbb;
+      text-align: center;
+    }
+
+    .day input[type="checkbox"] {
+      margin-left: 8px;
+    }
+
+    .save-hours-btn {
+      background-color: #7e3f98;
+      color: white;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 20px;
+      margin-top: 10px;
+      cursor: pointer;
+      width: 90%;
+    }
+
+    .save-hours-btn:hover {
+      background-color: #632d74;
+    }
+
+    #timer-display {
+      font-size: 3em;
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 10px;
+      color: #6f3392;
+    }
+
+    button {
+      background-color: #9b59b6;
+      color: white;
+      border: none;
+      padding: 12px 22px;
+      margin: 0 8px 8px 0;
+      border-radius: 30px;
+      cursor: pointer;
+      font-size: 1.1em;
+    }
+
+    button:hover:not(:disabled) {
+      background-color: #7e3f98;
+    }
+
+    button:disabled {
+      background-color: #aaa;
+      cursor: not-allowed;
+    }
+
+    blockquote {
+      font-style: italic;
+      color: #5b3a71;
+      border-left: 6px solid #9b59b6;
+      padding-left: 15px;
+      margin: 15px 0;
+      background: #f7f1fa;
+      border-radius: 8px;
+      font-size: 1.1em;
+    }
+
+    #reward-message {
+      display: none;
+      background: #dff0d8;
+      border: 2px solid #9b59b6;
+      color: #3c763d;
+      padding: 10px 15px;
+      border-radius: 8px;
+      font-weight: bold;
+      margin: 15px 0;
+      text-align: center;
+    }
+
+    #task-input {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    #new-task {
+      flex: 1;
+      padding: 8px;
+      border-radius: 4px;
+      border: 1px solid #bbb;
+    }
+
+    #task-list {
+      list-style: none;
+      padding: 0;
+    }
+
+    #task-list li {
+      margin-bottom: 10px;
+      font-size: 0.9em;
+      background: #f8f4fb;
+      padding: 8px;
+      border-radius: 6px;
+      box-shadow: 0 1px 4px rgba(155, 89, 182, 0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .remove-btn {
+      background-color: #e74c3c;
+      color: white;
+      border: none;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.85em;
+      cursor: pointer;
+      margin-left: 10px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>
+      <span class="header-sticker">📖</span>
+      Personalized Study Planner
+      <span class="header-sticker">🧠</span>
+    </h1>
+  </header>
+
+  <div class="main-container">
+    <div id="calendar-section">
+      <section>
+        <h2>Weekly Study Calendar</h2>
+        <div id="reward-message">🎉 You completed your goals! 🎉</div>
+        <div id="calendar"></div>
+      </section>
+    </div>
+
+    <div id="right-panel">
+      <section>
+        <h2>AI Assistant</h2>
+        <div id="task-input">
+          <input type="text" id="new-task" placeholder="Type your task here..." />
+          <button id="add-task">Add Task</button>
+        </div>
+        <ul id="task-list"></ul>
+      </section>
+
+      <section>
+        <h2>Study Timer</h2>
+        <div id="timer-display">00:00:00</div>
+        <button id="start-timer">Start</button>
+        <button id="stop-timer" disabled>Stop</button>
+        <button id="reset-timer" disabled>Reset</button>
+      </section>
+
+      <section>
+        <h2>Motivational Quote</h2>
+        <blockquote id="motivational-quote"></blockquote>
+        <button id="new-quote">New Quote</button>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const subjects = ['Probability', 'Automata', 'OS', 'Management'];
+      const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+      const emojis = ['📚', '✏️', '🖊️', '📘', '📝', '📒', '📎'];
+      const dailyStudyHours = 2;
+
+      function generateSchedule() {
+        const saved = localStorage.getItem('studySchedule');
+        if (saved) return JSON.parse(saved);
+        const defaultHours = dailyStudyHours / subjects.length;
+        return Array.from({ length: 7 }, () => {
+          const obj = {};
+          subjects.forEach(s => obj[s] = defaultHours.toFixed(2));
+          return obj;
+        });
+      }
+
+      function renderCalendar(schedule) {
+        const calendar = document.getElementById('calendar');
+        calendar.innerHTML = '';
+        const completion = JSON.parse(localStorage.getItem('taskCompletion') || '{}');
+
+        days.forEach((day, i) => {
+          const dayDiv = document.createElement('div');
+          dayDiv.className = 'day';
+
+          const h3 = document.createElement('h3');
+          h3.textContent = day;
+          dayDiv.appendChild(h3);
+
+          const sticker = document.createElement('div');
+          sticker.className = 'sticker';
+          sticker.textContent = emojis[i % emojis.length];
+          dayDiv.appendChild(sticker);
+
+          const ul = document.createElement('ul');
+          subjects.forEach(subj => {
+            const li = document.createElement('li');
+            const label = document.createElement('label');
+            label.textContent = subj + ': ';
+
+            const input = document.createElement('input');
+            input.type = 'number';
+            input.min = '0';
+            input.step = '0.1';
+            input.value = schedule[i][subj];
+            input.addEventListener('change', () => {
+              schedule[i][subj] = parseFloat(input.value || 0).toFixed(2);
+            });
+
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            const key = `${day}-${subj}`;
+            checkbox.checked = completion[key] || false;
+            checkbox.addEventListener('change', () => {
+              completion[key] = checkbox.checked;
+              localStorage.setItem('taskCompletion', JSON.stringify(completion));
+              checkDayCompletion(day);
+            });
+
+            li.appendChild(label);
+            li.appendChild(input);
+            li.appendChild(checkbox);
+            ul.appendChild(li);
+          });
+
+          const btn = document.createElement('button');
+          btn.textContent = 'Save Day Hours';
+          btn.className = 'save-hours-btn';
+          btn.onclick = () => {
+            localStorage.setItem('studySchedule', JSON.stringify(schedule));
+            alert(`Saved schedule for ${day}`);
+          };
+
+          dayDiv.appendChild(ul);
+          dayDiv.appendChild(btn);
+          calendar.appendChild(dayDiv);
+
+          checkDayCompletion(day);
+        });
+      }
+
+      function checkDayCompletion(day) {
+        const completion = JSON.parse(localStorage.getItem('taskCompletion') || '{}');
+        const allDone = ['Probability', 'Automata', 'OS', 'Management'].every(subj => completion[`${day}-${subj}`]);
+        const msg = document.getElementById('reward-message');
+        if (allDone) {
+          msg.style.display = 'block';
+          msg.textContent = `🎉 Congrats! You completed all tasks for ${day}! Here's a reward: 🎁 Keep up the great work!`;
+          setTimeout(() => {
+            msg.style.display = 'none';
+          }, 4000);
+        } else {
+          msg.style.display = 'none';
+        }
+      }
+
+      // Timer
+      let timerInterval = null;
+      let elapsedSeconds = 0;
+      const timerDisplay = document.getElementById('timer-display');
+      const startBtn = document.getElementById('start-timer');
+      const stopBtn = document.getElementById('stop-timer');
+      const resetBtn = document.getElementById('reset-timer');
+
+      function updateTimer() {
+        elapsedSeconds++;
+        const hrs = Math.floor(elapsedSeconds / 3600).toString().padStart(2, '0');
+        const mins = Math.floor((elapsedSeconds % 3600) / 60).toString().padStart(2, '0');
+        const secs = (elapsedSeconds % 60).toString().padStart(2, '0');
+        timerDisplay.textContent = `${hrs}:${mins}:${secs}`;
+      }
+
+      startBtn.onclick = () => {
+        if (!timerInterval) {
+          timerInterval = setInterval(updateTimer, 1000);
+          startBtn.disabled = true;
+          stopBtn.disabled = false;
+          resetBtn.disabled = false;
+        }
+      };
+
+      stopBtn.onclick = () => {
+        clearInterval(timerInterval);
+        timerInterval = null;
+        startBtn.disabled = false;
+        stopBtn.disabled = true;
+      };
+
+      resetBtn.onclick = () => {
+        clearInterval(timerInterval);
+        timerInterval = null;
+        elapsedSeconds = 0;
+        timerDisplay.textContent = '00:00:00';
+        startBtn.disabled = false;
+        stopBtn.disabled = true;
+        resetBtn.disabled = true;
+      };
+
+      // Quotes
+      const quotes = [
+        "You don’t have to be perfect, you just have to be consistent.",
+        "Don’t watch the clock; do what it does. Keep going. – Sam Levenson",
+        "There are no shortcuts to any place worth going. – Beverly Sills",
+        "Don’t wait for the perfect moment. Take the moment and make it perfect. – Zoey Sayward",
+        "Wake up with determination. Go to bed with satisfaction."
+      ];
+
+      const quoteElem = document.getElementById('motivational-quote');
+      const newQuoteBtn = document.getElementById('new-quote');
+
+      function displayRandomQuote() {
+        const index = Math.floor(Math.random() * quotes.length);
+        quoteElem.textContent = quotes[index];
+      }
+
+      newQuoteBtn.onclick = displayRandomQuote;
+
+      // Tasks
+      const taskInput = document.getElementById('new-task');
+      const addTaskBtn = document.getElementById('add-task');
+      const taskList = document.getElementById('task-list');
+
+      function loadTasks() {
+        const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+        tasks.forEach(task => addTaskToList(task));
+      }
+
+      function addTaskToList(task) {
+        const li = document.createElement('li');
+        const taskText = document.createElement('span');
+        taskText.textContent = task;
+        const removeBtn = document.createElement('button');
+        removeBtn.textContent = 'Remove';
+        removeBtn.className = 'remove-btn';
+        removeBtn.onclick = () => {
+          li.remove();
+          removeTask(task);
+        };
+        li.appendChild(taskText);
+        li.appendChild(removeBtn);
+        taskList.appendChild(li);
+      }
+
+      function saveTask(task) {
+        const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+        tasks.push(task);
+        localStorage.setItem('tasks', JSON.stringify(tasks));
+      }
+
+      function removeTask(taskToRemove) {
+        const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+        const updatedTasks = tasks.filter(task => task !== taskToRemove);
+        localStorage.setItem('tasks', JSON.stringify(updatedTasks));
+      }
+
+      addTaskBtn.onclick = () => {
+        const task = taskInput.value.trim();
+        if (task) {
+          addTaskToList(task);
+          saveTask(task);
+          taskInput.value = '';
+        }
+      };
+
+      loadTasks();
+      const schedule = generateSchedule();
+      renderCalendar(schedule);
+      displayRandomQuote();
+    });
+  </script>
+</body>
+</html>
